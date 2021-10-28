@@ -85,23 +85,6 @@ public class Student {
         return result;
     }
 
-    //    public static ArrayList<Student> tenLowerPointTK(ArrayList<Student> list){
-//        ArrayList<Student> arrayList = new ArrayList<>();
-//        for (int i = 0; i < list.size(); i++) {
-//            for(int j = i+1;j<list.size();j++) {
-//                if (totalPoint(list.get(j)) < totalPoint(list.get(i))) {
-//                    Student a = list.get(i);
-//                    list.set(i, list.get(j));
-//                    list.set(j, a);
-//                }
-//            }
-//        }
-//        for (int i = 0; i < 10; i++) {
-//            arrayList.add(list.get(i));
-//        }
-//        printList(arrayList);
-//        return arrayList;
-//    }
     public static void top10LowerPoitTotal(List<Student> list) {
         Collections.sort(list, new Comparator<Student>() {
             @Override
