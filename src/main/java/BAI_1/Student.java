@@ -1,19 +1,20 @@
 package BAI_1;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class Student {
     private int id;
     private String name;
     private String email;
-    private int bonus;
-    private int report;
-    private int app;
+    private double bonus;
+    private double report;
+    private double app;
     private double lt;
+    private double total;
 
     public Student(int id, String name, String email, int bonus, int report, int app, double lt) {
         this.id = id;
@@ -30,7 +31,7 @@ public class Student {
 
     public static String toString(Student st) {
         return "Student [id =" + st.id + ", name =" + st.name + ", email =" + st.email + ", bonus =" + st.bonus +
-                ", report =" + st.report + ", app =" + st.app + ", lt =" + st.lt + "]";
+                ", report =" + st.report + ", app =" + st.app + ", lt =" + st.lt +"]";
     }
 
     public static ArrayList<Student> readStudent(String nameFile) throws IOException {
@@ -43,10 +44,8 @@ public class Student {
         while ((line = bufferedReader.readLine()) != null) {
             re = line;
             split = re.split(",");
-//            for (int i = 0; i < 7; i++) {
-                student = new Student(Integer.parseInt(split[0]), split[1], split[2], Integer.parseInt(split[3])
-                        , Integer.parseInt(split[4]), Integer.parseInt(split[5]), Double.parseDouble(split[6]));
-//            }
+            student = new Student(Integer.parseInt(split[0]), split[1], split[2], Integer.parseInt(split[3])
+                    , Integer.parseInt(split[4]), Integer.parseInt(split[5]), Double.parseDouble(split[6]));
             arrStudent.add(student);
         }
         bufferedReader.close();
@@ -59,74 +58,75 @@ public class Student {
         }
     }
 
-    public static boolean findMin(ArrayList<Student> list, double pointLT) {
-        int i = 0;
-        while (i != list.size()) {
-            if (pointLT > list.get(i).lt) {
-                return false;
-            }
-            i++;
-        }
-        return true;
-    }
-
-    public static boolean findMinTotal(ArrayList<Student> list, double pointTotal) {
-        int i = 0;
-        while (i != list.size()) {
-            if (pointTotal > totalPoint(list.get(i))) {
-                return false;
-            }
-            i++;
-        }
-        return true;
-    }
-
     public static ArrayList<Student> tenHighestPointLT(ArrayList<Student> list) {
         ArrayList<Student> arrayList = new ArrayList<>();
-        while (!findMin(list, list.get(0).lt)) {
-            for (int i = 0; i < list.size() - 1; i++) {
-                if (list.get(i + 1).lt < list.get(i).lt) {
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = i + 1; j < list.size(); j++) {
+                if (list.get(j).lt < list.get(i).lt) {
                     Student a = list.get(i);
-                    list.set(i, list.get(i + 1));
-                    list.set(i + 1, a);
+                    list.set(i, list.get(j));
+                    list.set(j, a);
                 }
             }
         }
         int size = list.size();
         for (int i = size - 10; i < size; i++) {
-           arrayList.add(list.get(i));
+            arrayList.add(list.get(i));
         }
-        System.out.println(arrayList.size() + "---");
         printList(arrayList);
         return arrayList;
     }
 
     public static double totalPoint(Student student) {
         double result = 0;
-        System.out.println(toString(student));
         result = student.bonus * 0.1 + student.report * 0.3 + student.app * 0.15 + student.lt * 0.45;
-        result = Math.ceil(result*100)/100;
+        result = Math.ceil(result * 100) / 100;
+        student.setTotal(result);
         return result;
     }
 
-    public static ArrayList<Student> tenLowerPointTK(ArrayList<Student> list){
-        ArrayList<Student> arrayList = new ArrayList<>();
-        while (!findMin(list, totalPoint(list.get(0)))) {
-            for (int i = 0; i < list.size() - 1; i++) {
-                if (totalPoint(list.get(i + 1)) < totalPoint(list.get(i))) {
-                    Student a = list.get(i);
-                    list.set(i, list.get(i + 1));
-                    list.set(i + 1, a);
-                }
+    //    public static ArrayList<Student> tenLowerPointTK(ArrayList<Student> list){
+//        ArrayList<Student> arrayList = new ArrayList<>();
+//        for (int i = 0; i < list.size(); i++) {
+//            for(int j = i+1;j<list.size();j++) {
+//                if (totalPoint(list.get(j)) < totalPoint(list.get(i))) {
+//                    Student a = list.get(i);
+//                    list.set(i, list.get(j));
+//                    list.set(j, a);
+//                }
+//            }
+//        }
+//        for (int i = 0; i < 10; i++) {
+//            arrayList.add(list.get(i));
+//        }
+//        printList(arrayList);
+//        return arrayList;
+//    }
+    public static void top10LowerPoitTotal(List<Student> list) {
+        Collections.sort(list, new Comparator<Student>() {
+            @Override
+            public int compare(Student o1, Student o2) {
+                return Double.compare(totalPoint(o1), totalPoint(o2));
             }
+        });
+
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(toString(list.get(i)));
+            if (i == 9)
+                break;
         }
-        int size = list.size();
-        for (int i = 0; i < 10; i++) {
-            arrayList.add(list.get(i));
+    }
+
+    public static void output(ArrayList<Student> list) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("." + File.separator + "output.csv"));
+        bufferedWriter.write("ID,name,email,bonus,report,app,lt,total\n");
+        for (int i = 0; i < list.size(); i++) {
+            bufferedWriter.write(list.get(i).id + "," + list.get(i).name + "," + list.get(i).email + "," + list.get(i).bonus + ","
+                    + list.get(i).report + "," + list.get(i).app + "," + list.get(i).lt + "," + list.get(i).total + "\n");
+            bufferedWriter.flush();
         }
-        System.out.println(arrayList.size() + "---");
-        printList(arrayList);
-        return arrayList;
+        bufferedWriter.close();
+        System.out.println("DONE");
     }
 
     public int getId() {
@@ -153,7 +153,7 @@ public class Student {
         this.email = email;
     }
 
-    public int getBonus() {
+    public double getBonus() {
         return bonus;
     }
 
@@ -161,7 +161,7 @@ public class Student {
         this.bonus = bonus;
     }
 
-    public int getReport() {
+    public double getReport() {
         return report;
     }
 
@@ -169,7 +169,7 @@ public class Student {
         this.report = report;
     }
 
-    public int getApp() {
+    public double getApp() {
         return app;
     }
 
@@ -185,4 +185,11 @@ public class Student {
         this.lt = lt;
     }
 
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
 }
